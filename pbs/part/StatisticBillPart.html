@@ -1,0 +1,166 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">日常收支表</h3>
+	</div>
+	<div class="panel-body">
+		<p>
+			<form class="form-inline">
+				<div class="form-group">
+					<label for="timeSelect" class="col-sm-2 control-label hidden">日期</label> 
+					<select id="timeSelect" name="timeSelect" class="form-control" onchange="setDateInputOnChange(this, $('#startDate'), $('#endDate'))">
+						<option value="">日期</option>
+						<option value="1">今日</option>
+						<option value="2">本周</option>
+						<option value="3">本月</option>
+						<option value="4">今年</option>
+						<option value="5">上周</option>
+						<option value="6">上月</option>
+						<option value="7">去年</option>
+					</select>
+				</div>
+				<span>从</span>
+				<div class="input-group date">
+					<label for="startDate" class="col-sm-2 control-label hidden">起始日期</label> 
+					<input type="text" class="form-control date-picker" id="startDate" name="startDate" placeholder="起始日期" readonly />
+				</div>
+				<span>至</span>
+				<div class="form-group">
+					<label for="endDate" class="col-sm-2 control-label hidden">结束日期</label> 
+					<input type="text" class="form-control date-picker" id="endDate" name="endDate" placeholder="结束日期" readonly />
+				</div>
+				<button type="button" class="btn btn-primary" onclick="getStatisticBill();">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询
+				</button>
+			</form>
+		</p>
+		<ul class="nav nav-tabs">
+			<li role="presentation" class="active"><a href="#pinTab" aria-controls="pinTab" role="tab" data-toggle="tab">饼图</a></li>
+			<li role="presentation"><a href="#tableTab" aria-controls="tableTab" role="tab" data-toggle="tab">表格</a></li>
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="pinTab">
+				<div class="row">
+					<div class="col-sm-6 text-center">
+						<h4>支出详情</h4>
+						<div id="billOutChartDiv">
+							<canvas id="billOutChart" height="350"></canvas>
+						</div>
+					</div>
+					<div class="col-sm-6 text-center">
+						<h4>收入详情</h4>
+						<div id="billInChartDiv">
+							<canvas id="billInChart" height="350"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane fade" id="tableTab">
+				<div class="row">
+					<div class="col-sm-6">
+						<table id="billOutTbl" class="table table-hover">
+							<tr>
+								<th colspan="2">支出</th>
+							</tr>
+							<tr data-template="templateRow" class="sr-only">
+								<td data-key="bill_type_name" width="70%"></td>
+								<td data-key="bill_sum_f" class="text-right"></td>
+							</tr>
+							<tr class="noDataTr hidden">
+								<td colspan="2">无统计数据</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-sm-6">
+						<table id="billInTbl" class="table table-hover">
+							<tr>
+								<th colspan="2">收入</th>
+							</tr>
+							<tr data-template="templateRow" class="sr-only">
+								<td data-key="bill_type_name" width="70%"></td>
+								<td data-key="bill_sum_f" class="text-right"></td>
+							</tr>
+							<tr class="noDataTr hidden">
+								<td colspan="2">无统计数据</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<table class="table table-hover">
+						<tr>
+							<th width="70%">总计</th>
+							<th id="billRevenue" class="text-right"></th>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function() {
+		// 初始化时间选择器
+		$("#startDate, #endDate").datepicker({
+			autoclose : true,
+			format : "yyyy-mm-dd",
+			todayBtn : true,
+			todayHighlight : true,
+			language : "zh-CN",
+			minView : "month",
+			orientation : "bottom"
+		});
+		var timeSelect = $("#timeSelect");
+		timeSelect.val("3");
+		setDateInputOnChange(timeSelect.get(0), $("#startDate"), $("#endDate"));
+		
+		getStatisticBill();
+	});
+
+	function getStatisticBill() {
+		var startDate = $("#startDate");
+		var endDate = $("#endDate");
+		$.ajax({
+			url : domainUrl + "pbs/action/statistic_action.php",
+			type : "POST",
+			data : {
+				"method" : "getBillStatistic",
+				"startDate" : startDate.val(),
+				"endDate" : endDate.val()
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.retCode == "0"){
+					//图表
+					$("#billOutChartDiv").empty().append("<canvas id=\"billOutChart\" height=\"350\"></canvas>");
+					$("#billInChartDiv").empty().append("<canvas id=\"billInChart\" height=\"350\"></canvas>");
+					
+					var ctx = $("#billOutChart").get(0).getContext("2d");
+					var myNewChart = new Chart(ctx).Pie(data.billOutChart, {
+						tooltipTemplate: "<%= label%>",
+					});
+					
+					var ctx2 = $("#billInChart").get(0).getContext("2d");
+					var myNewChart2 = new Chart(ctx2).Pie(data.billInChart, {
+						tooltipTemplate: "<%= label%>",
+					});
+					
+					//表格
+					bindData("billOutTbl", data.billOutStatistic, "bill_type_id", statisticBillBindedEvent);
+					bindData("billInTbl", data.billInStatistic, "bill_type_id", statisticBillBindedEvent);
+					$("#billRevenue").text(data.billRevenue);
+				}
+			}
+		});
+	}
+	
+	function statisticBillBindedEvent(jRow, data) {
+		if(data.bill_type_id == "0") {
+			jRow.find("td:eq(0)").html("<strong>" + data.bill_type_name + "</strong>");
+			jRow.find("td:eq(1)").html("<strong>" + data.bill_sum_f + "</strong>");
+		}
+		return jRow;
+	}
+
+</script>

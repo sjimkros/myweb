@@ -1,0 +1,135 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">收支趋势统计</h3>
+	</div>
+	<div class="panel-body">
+		<p>
+		<form class="form-inline">
+			<div class="form-group">
+				<label for="year" class="control-label">年份</label> 
+				<select id="year" name="year" class="form-control">
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="month" class="control-label">月份</label> 
+				<select id="month" name="month" class="form-control">
+					<option value="">全部</option>
+					<option value="1">01</option>
+					<option value="2">02</option>
+					<option value="3">03</option>
+					<option value="4">04</option>
+					<option value="5">05</option>
+					<option value="6">06</option>
+					<option value="7">07</option>
+					<option value="8">08</option>
+					<option value="9">09</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="billType" class="control-label">收支类别</label> 
+				<select id="billType" name="billType" class="form-control">
+					<option value="">全部</option>
+					<option value="f0">支出</option>
+					<option value="f1">收入</option>
+					<option value="-" disabled>——</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="account" class="control-label">账户</label> 
+				<select id="account" name="account" class="form-control">
+					<option value="" class="all">全部</option>
+				</select>
+			</div>
+			<button type="button" class="btn btn-primary" onclick="getStatisticTrend();">
+				<span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询
+			</button>
+		</form>
+		</p>
+		<div class="row">
+			<div class="col-md-10">
+				<div id="trendChartDiv">
+					<canvas id="trendChart" height="420"></canvas>
+				</div>
+			</div>
+			<div class="col-md-2" id="trendLegendDiv">
+			
+			</div>
+		</div>
+		
+	</div>
+</div>
+<script type="text/javascript">
+	$(function() {
+		initTrendData();
+	});
+
+	function initTrendData() {
+		$.ajax({
+			url : domainUrl + "pbs/action/statistic_action.php",
+			type : "POST",
+			data : {
+				"method" : "initTrendStatisticData"
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.retCode == "0") {
+					bindDataForSelect("year", data.yearList, "yearVal", "yearStr");
+					bindDataForSelect("billType", data.billTypeList, "bill_type_id", "bill_type_name");
+					bindDataForSelect("account", data.accountList, "account_id", "account_name");
+
+					getStatisticTrend();
+				}
+			}
+		});
+	}
+
+	function getStatisticTrend() {
+		var year = $("#year");
+		var month = $("#month");
+		var account = $("#account");
+		var billType = $("#billType");
+
+		var billTypeId = "";
+		var billTypeFlag = "";
+		if (billType.val().indexOf("f") > -1) { //选择的是billTypeFlag
+			billTypeFlag = billType.val().replace("f", "");
+		} else {
+			billTypeId = billType.val();
+		}
+
+		$.ajax({
+			url : domainUrl + "pbs/action/statistic_action.php",
+			type : "POST",
+			data : {
+				"method" : "getTrendStatistic",
+				"year" : year.val(),
+				"month" : month.val(),
+				"accountId" : account.val(),
+				"billTypeId" : billTypeId,
+				"billTypeFlag" : billTypeFlag
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.retCode == "0") {
+					//图表
+					$("#trendChartDiv").empty().append("<canvas id=\"trendChart\" width=\"850\" height=\"420\"></canvas>");
+
+					var ctx = $("#trendChart").get(0).getContext("2d");
+					var myNewChart = new Chart(ctx).Bar(data.trendChart, {
+						legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend legend-ul\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+					});
+					
+					if(billTypeId == "" && billTypeFlag == "") {
+						var legend = myNewChart.generateLegend();
+						$('#trendLegendDiv').html(legend);
+					} else {
+						$('#trendLegendDiv').html("");
+					}
+				}
+			}
+		});
+	}
+</script>

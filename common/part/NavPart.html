@@ -1,0 +1,58 @@
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="${domainUrl}/pbs/index.php">我的主页</a>
+	    </div>
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	    	<ul class="nav navbar-nav">
+	    		<li id="menuBill"><a href="${domainUrl}/pbs/bill.php">日常流水账</a></li>
+	    		<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">开始记账 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="${domainUrl}/pbs/bill.php?flag=1">收入</a></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=0">支出</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=5">借入/预收</a></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=6">借出/垫付</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=7">还欠款</a></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=4">收欠款/报销</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="${domainUrl}/pbs/bill.php?flag=2">存取款/转账/还信用卡</a></li>
+					</ul>
+	        	</li>
+	        	<li id="menuStatistic" class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">统计分析 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="${domainUrl}/pbs/statisticBill.php">日常收支表</a></li>
+						<li><a href="${domainUrl}/pbs/statisticTrend.php">收支趋势统计</a></li>
+						<!-- 
+						<li><a href="#">资金流量表</a></li>
+						<li><a href="#">资产负债表</a></li>
+						 -->
+					</ul>
+	        	</li>
+	   		</ul>
+	   		<form class="nav navbar-form navbar-right">
+				<a href="${domainUrl}/common/logout.php"><button type="button" class="btn btn-default">退出</button></a>
+			</form>
+	   		<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">设置 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="${domainUrl}/pbs/account.php">账户管理</a></li>
+						<li><a href="${domainUrl}/pbs/billType.php">收支类别</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="${domainUrl}/common/profile.php">个人中心</a></li>
+					</ul>
+				</li>
+			</ul>
+	  	</div>
+	</div>
+</nav>

@@ -1,0 +1,33 @@
+<?php  //主页
+include_once '_approot.php';
+include_once APPROOT . '/lib/header.php';
+
+session_check(get_current_url());
+
+$base = new PageBase(TEMPLATE,' 个人记账系统', PageBase::$LAYOUT_COLUMN2_NARROWLEFT);
+$base->setPgeSubTitle('日常收支表');
+$base->setActiveMenuId('menuStatistic');
+
+$base->addCss(array (
+		'/css/bootstrap-datepicker3.min.css'
+));
+$base->addScript(array (
+		'/js/pbs/dateQuery.js',
+		'/js/bootstrap-datepicker.min.js',
+		'/js/locales/bootstrap-datepicker.zh-CN.min.js',
+		'/js/pbs/Chart.min.js'
+));
+
+$navPart = new NavPart();
+$base->setNavPart($navPart);
+
+$accountQuickListPart = new AccountQuickListPart();
+$base->addPart(PageBase::$BODY_LEF, $accountQuickListPart);
+
+$statisticBillPart = new StatisticBillPart();
+$base->addPart(PageBase::$BODY_CENTER, $statisticBillPart);
+
+
+$base->show();
+
+?>

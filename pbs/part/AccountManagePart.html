@@ -1,0 +1,106 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">账户管理</h3>
+	</div>
+	<div class="panel-body">
+		<p>
+			<button type="button" class="btn btn-primary" onclick="showManageDialog('add');">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增账户
+			</button>
+			<button type="button" class="btn btn-default" onclick="setAccountDefault();">
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 设为默认
+			</button>
+		</p>
+		<div id="mustCheckAccount" class="alert alert-danger hidden" role="alert">请选择要设置默认的账户</div>
+		<table id="accountListTbl" class="table table-hover">
+			<tr>
+				<th style="width: 4%;">&nbsp;</th>
+				<th style="width: 5%;">默认</th>
+				<th style="width: 15%;">账户名称</th>
+				<th style="width: 15%;">账户类型</th>
+				<th style="width: 10%;">当前余额</th>
+				<th>说明</th>
+				<th style="width: 150px;">操作</th>
+			</tr>
+			<tr data-template="templateRow" class="sr-only">
+				<td data-event="account_id"><input type="radio" name="select" /></td>
+				<td data-event="account_default" class="text-center"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+				<td data-key="account_name"></td>
+				<td data-key="account_type_name"></td>
+				<td data-key="account_sum" class="text-right"></td>
+				<td data-key="account_desc"></td>
+				<td data-event="operate">
+					<a href="javascript:;" onclick="showManageDialog('edit', this);">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 修改</a> 
+					<a href="javascript:;" onclick="confirmDeleteAccount(this)">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>
+				</td>
+			</tr>
+			<tr class="noDataTr hidden">
+				<td colspan="7">没有找到符合条件的记录</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div id="accountDialog" class="modal fade modal_wrapper" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">新增账户</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="accountName" class="col-sm-3 control-label">账户名称</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="accountName" name="accountName" placeholder="账户名称" data-key="account_name" length="20" />
+							<div id="mustInputAccountName" class="alert alert-danger hidden" role="alert">请输入账户名称</div>
+							<div id="existAccountName" class="alert alert-danger hidden" role="alert">账户名称已存在</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="accountSum" class="col-sm-3 control-label">初始金额</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="accountSum" name="accountSum" placeholder="初始金额" data-key="account_sum" />
+							<div id="mustInputAccountSum" class="alert alert-danger hidden" role="alert">请输入初始金额</div>
+							<div id="isNanAccountSum" class="alert alert-danger hidden" role="alert">请输入数字</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="accountDesc" class="col-sm-3 control-label">说明</label>
+						<div class="col-sm-8">
+							<textarea id="accountDesc" name="accountDesc" class="form-control" rows="3" data-key="account_desc"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="accountType" class="col-sm-3 control-label">账户类型</label>
+						<div class="col-sm-8">
+							<select id="accountType" name="accountType" class="form-control" data-key="account_type_id">
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="accountFlag" class="col-sm-3 control-label">账户状态</label>
+						<div class="col-sm-8">
+							<label class="radio-inline"> <input type="radio" name="accountFlag" id="accountFlag0" value="0" data-key="account_flag" checked> 正常
+							</label> <label class="radio-inline"> <input type="radio" name="accountFlag" id="accountFlag1" value="1" data-key="account_flag"> 冻结
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="submitAccount();">保存</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+			<input type="hidden" id="accountId" name="accountId" data-key="account_id" />
+			<input type="hidden" id="op" name="op" />
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

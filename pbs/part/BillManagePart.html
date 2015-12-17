@@ -1,0 +1,194 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">日常流水账</h3>
+	</div>
+	<div class="panel-body">
+		<p>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 1);">收入</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 0);">支出</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 5);">借入/预收</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 6);">借出/垫付</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 4);">还欠款</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 7);">收欠款/报销</button>
+			<button type="button" class="btn btn-default" onclick="showBillDialog('add', 2);">存取款/转账/还信用卡</button>
+			<button type="button" class="btn btn-default">导出</button>
+		</p>
+		<p>
+			<form class="form-inline">
+				<div class="form-group">
+					<label for="timeSelect" class="col-sm-2 control-label hidden">日期</label>
+					<select id="timeSelect" name="timeSelect" class="form-control" onchange="setDateInputOnChange(this, $('#startDate'), $('#endDate'))">
+						<option value="">日期</option>
+						<option value="1">今日</option>
+						<option value="2">本周</option>
+						<option value="3">本月</option>
+						<option value="4">今年</option>
+						<option value="5">上周</option>
+						<option value="6">上月</option>
+						<option value="7">去年</option>
+					</select>
+				</div>
+				<span>从</span>
+				<div class="input-group date">
+					<label for="startDate" class="col-sm-2 control-label hidden">起始日期</label>
+					<input type="text" class="form-control date-picker" id="startDate" name="startDate" placeholder="起始日期" readonly/>
+				</div>
+				<span>至</span>
+				<div class="form-group">
+					<label for="endDate" class="col-sm-2 control-label hidden">结束日期</label>
+					<input type="text" class="form-control date-picker" id="endDate" name="endDate" placeholder="结束日期" readonly/>
+				</div>
+				<div class="form-group">
+					<label for="billType" class="control-label">收支类别</label>
+					<select id="billType" name="billType" class="form-control">
+						<option value="" class="all">全部</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="account" class="control-label">账户</label>
+					<select id="account" name="account" class="form-control">
+						<option value="" class="all">全部</option>
+					</select>
+				</div>
+				<button type="button" class="btn btn-primary" onclick="queryBill();"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询</button>
+				<input type="hidden" name="billTypeFlag" id="billTypeFlag" />
+			</form>
+		</p>
+		<div id="mustStartDateBeforEndDate" class="alert alert-danger hidden" role="alert">起始日期不能晚于结束日期</div>
+		<hr/>
+		<table id="billListTbl" class="table table-hover">
+			<tr>
+				<th style="width:12%;">日期</th>
+				<th style="width:12%;">账户</th>
+				<th style="width:10%;" class="text-right">流入</th>
+				<th style="width:10%;" class="text-right">流出</th>
+				<th style="width:10%;">收支类别</th>
+				<th>说明</th>
+				<th style="width:150px;">操作</th>
+			</tr>
+			<tr data-template="templateRow" class="sr-only">
+				<td data-key="bill_time"></td>
+				<td data-key="account_name"></td>
+				<td data-key="bill_in_sum" class="text-right"></td>
+				<td data-key="bill_out_sum" class="text-right"></td>
+				<td data-key="bill_type_name"></td>
+				<td data-key="bill_desc"></td>
+				<td data-event="operate">
+					<a href="javascript:;" onclick="showBillDialog('edit', null, this);">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 修改</a> 
+					<a href="javascript:;" onclick="confirmDeletBill(null, this)">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>						
+				</td>
+			</tr>
+			<tr class="noDataTr hidden">
+				<td colspan="7">没有找到符合条件的记录</td>
+			</tr>
+		</table>
+		<nav class="text-center">
+			<ul id="billListPaginator"></ul>
+			<input type="hidden" name="curPageIndex" id="curPageIndex" value="1" />
+			<input type="hidden" name="pageSize" id="pageSize" />
+		</nav>
+	</div>
+</div>
+<div id="billDialog" class="modal fade modal_wrapper" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">新增</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="dialog_billTime" class="col-sm-3 control-label">日期</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control date-picker" id="dialog_billTime" name="dialog_billTime" placeholder="日期" data-key="bill_time" readonly />
+							<div id="mustInputBillTime" class="alert alert-danger hidden" role="alert">请输入日期</div>
+							<div id="mustRepayTimeAfterDebtTime" class="alert alert-danger hidden" role="alert">{repay_action}款日期应大于等{debt_action}日期</div>
+						</div>
+					</div>
+					<div id="billTypeDiv" class="form-group">
+						<label for="dialog_billType" class="col-sm-3 control-label">收支类别</label>
+						<div class="col-sm-8">
+							<select id="dialog_billType" name="dialog_billType" class="form-control" data-key="bill_type_id">
+							</select>
+						</div>
+					</div>
+					<div id="account1Div" class="form-group">
+						<label for="dialog_account1" class="col-sm-3 control-label">账户</label>
+						<div class="col-sm-8">
+							<select id="dialog_account1" name="dialog_account1" class="form-control" data-key="account_id">
+							</select>
+						</div>
+					</div>
+					<div id="billSumDiv" class="form-group">
+						<label for="dialog_billSum" class="col-sm-3 control-label">金额</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="dialog_billSum" name="dialog_billSum" placeholder="金额" data-key="bill_sum" />
+							<div id="mustInputBillSum" class="alert alert-danger hidden" role="alert">请输入金额</div>
+							<div id="isNanBillSum" class="alert alert-danger hidden" role="alert">请输入数字，且金额大于0</div>
+							<div id="mustBillSumBelowRepaySum" class="alert alert-danger hidden" role="alert">金额应小于等于<span class="maxSum" data-key="bill_sum"></span></div>
+						</div>
+					</div>
+					<div id="account2Div" class="form-group">
+						<label for="dialog_account2" class="col-sm-3 control-label">账户</label>
+						<div class="col-sm-8">
+							<select id="dialog_account2" name="dialog_account2" class="form-control" data-key="account_id2">
+							</select>
+							<div id="mustAccount2Different" class="alert alert-danger hidden" role="alert">转入账户不能与转出账户相同</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="dialog_billDesc" class="col-sm-3 control-label">说明</label>
+						<div class="col-sm-8">
+							<textarea id="dialog_billDesc" name="dialog_billDesc" class="form-control" rows="3" data-key="bill_desc"></textarea>
+						</div>
+					</div>
+					<div id="existBillRelated" class="alert alert-danger hidden" role="alert">转入账户不能与转出账户相同</div>
+				</form>
+			</div>
+			<div id="repayDiv" class="modal-body hidden">
+				<table id="relatedList" class="table table-hover">
+					<tr>
+						<th width="15%" id="relatedDate">日期</th>
+						<th width="15%">账户</th>
+						<th width="12%" class="text-right">欠款</th>
+						<th width="12%" class="text-right">应付</th>
+						<th width="15%">本次实付</th>
+						<th>说明</th>
+					</tr>
+					<tr data-template="templateRow" class="sr-only">
+						<td data-key="bill_time"></td>
+						<td data-key="account_name"></td>
+						<td data-key="bill_sum"></td>
+						<td data-key="bill_related_sum" class="text-right"></td>
+						<td class="text-right" data-event='bill_id'>
+							<input type="text" class="form-control repaySum" />
+						</td>
+						<td data-key="bill_desc"></td>
+					</tr>
+					<tr class="noDataTr hidden">
+						<td colspan="7">无欠款信息</td>
+					</tr>
+				</table>
+				<div id="mustInputRelatedSum" class="alert alert-danger hidden" role="alert">请至少输入1条本次实付记录</div>
+				<div id="isNanRelatedSum" class="alert alert-danger hidden" role="alert">实付字段应输入数字，且金额大于0</div>
+				<div id="mustRelatedSumBelowRepaySum" class="alert alert-danger hidden" role="alert">实付金额应小于等于应付款额</div>
+				<div id="mustRefreshRepayList" class="alert alert-danger hidden" role="alert">数据已过期，请关闭该对话框重新操作</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="submitBill();">提交</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+			<input type="hidden" id="billId" name="billId" data-key="bill_id" />
+			<input type="hidden" id="op" name="op" />
+			<input type="hidden" id="dialog_billTypeFlag" name="dialog_billTypeFlag" />
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

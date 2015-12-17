@@ -1,0 +1,81 @@
+.hidden {
+	display: none;
+}
+
+.col-md-1 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-2 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-3 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-4 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-5 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-6 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-7 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-8 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.col-md-9 {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.navbar {
+	margin-right: -5px !important;
+	margin-left: -5px !important
+}
+
+.row {
+	padding-right: 5px !important;
+	padding-left: 5px !important
+}
+
+.modal-mid {
+	width: 400px;
+}
+
+#calendarPart .table-condensed {
+	width:100% !important;
+}
+#calendarPart .datepicker-inline {
+	width:100% !important;
+}
+.pagination {
+	cursor: pointer;
+}
+.alert {
+	margin-bottom: 0px !important;
+}
+.date-picker {
+	cursor: pointer;
+}
+.legend-ul {
+	list-style:none;
+}

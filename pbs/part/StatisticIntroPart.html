@@ -1,0 +1,97 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">当前统计</h3>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-6">
+				<table id="statisticBillTbl" class="table table-condensed">
+					<tr>
+						<th colspan="2">本月收支</th>
+					</tr>
+					<tr>
+						<td>收入</td>
+						<td class="text-right" data-key="bill_in"></td>
+					</tr>
+					<tr>
+						<td>支出</td>
+						<td class="text-right" data-key="bill_out"></td>
+					</tr>
+					<tr>
+						<td>净收入</td>
+						<td class="text-right" data-key="bill_revenue"></td>
+					</tr>
+				</table>
+				<table id="statisticAssetTbl" class="table table-condensed">
+					<tr>
+						<th colspan="2">我的资产</th>
+					</tr>
+					<tr data-template="templateRow" class="sr-only">
+						<td data-key="account_type_name"></td>
+						<td data-key="account_all_sum" class="text-right"></td>
+					</tr>
+					<tr id="assetTotalSum" class="lastFixed">
+						<td>资产合计</td>
+						<td data-key="asset_total_sum" class="text-right"></td>
+					</tr>
+				</table>
+				<table id="statisticDebtTbl" class="table table-condensed">
+					<tr class="table-head">
+						<th colspan="2">我的债务</th>
+					</tr>
+					<tr data-template="templateRow" class="sr-only">
+						<td data-key="account_type_name"></td>
+						<td data-key="account_all_sum" class="text-right text-danger"></td>
+					</tr>
+					<tr id="debtTotalSum" class="lastFixed">
+						<td>负债合计</td>
+						<td data-key="debt_total_sum" class="text-right text-danger"></td>
+					</tr>
+				</table>
+				<table id="statisticTotalTbl" class="table table-condensed">
+					<tr>
+						<th>净资产</th>
+						<th data-key="revenue_total_sum" class="text-right"></th>
+					</tr>
+				</table>
+			</div>
+			<div class="col-md-6">
+				<p class="text-center">本月消费详情</p>
+				<canvas id="billOutChart" height="260"></canvas>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	Chart.defaults.global.responsive = true;
+	
+	$(function() {
+		refreshStatisticIntro();
+	});
+
+	function refreshStatisticIntro() {
+		$.ajax({
+			url : domainUrl + "pbs/action/statistic_action.php",
+			type : "POST",
+			data : {
+				"method" : "getIntroStatistic"
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.retCode == "0") {
+					bindDataForOne("statisticBillTbl", data.billStatistic, "id");
+					bindData("statisticAssetTbl", data.assetStatistic, "id");
+					bindDataForField("assetTotalSum", "asset_total_sum", data.assetTotalSum);
+					bindData("statisticDebtTbl", data.debtStatistic, "id");
+					bindDataForField("debtTotalSum", "debt_total_sum", data.debtTotalSum);
+					bindDataForField("statisticTotalTbl", "revenue_total_sum", data.revenueTotalSum);
+
+					var ctx = $("#billOutChart").get(0).getContext("2d");
+					var myNewChart = new Chart(ctx).Pie(data.billOutStatistic, {
+						tooltipTemplate: "<%= label%>",
+					});
+				}
+			},
+		});
+	}
+</script>

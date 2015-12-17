@@ -1,0 +1,24 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">日历</h3>
+	</div>
+	<div class="panel-body">
+		<p>点击日期查看当日记录</p>
+		<div id="calendarPart" class="text-align"></div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function() {
+		$("#calendarPart").datepicker({
+			format : "yyyy-mm-dd",
+			todayBtn : true,
+			todayHighlight : true,
+			language : "zh-CN",
+			minView : "month"
+		});
+		$("#calendarPart").on('changeDate', function(event) {
+			var startDate = $("#calendarPart").datepicker('getFormattedDate');
+			location.href = "bill.php?startDate=" + startDate + "&endDate=" + startDate;
+		});
+	});
+</script>

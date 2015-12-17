@@ -1,0 +1,112 @@
+<div class="panel panel-default">
+	<div class="panel-body">
+		<ul class="nav nav-tabs">
+			<li role="presentation" class="active"><a href="#billTypeInTab" aria-controls="billTypeInTab" role="tab" data-toggle="tab">收入类别</a></li>
+			<li role="presentation"><a href="#billTypeOutTab" aria-controls="billTypeOutTab" role="tab" data-toggle="tab">支出类别</a></li>
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="billTypeInTab">
+				<p></p>
+				<p>	
+					<button type="button" class="btn btn-primary" onclick="showBillTypeDialog('add');">
+						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增类别
+					</button>
+				</p>
+				<table id="billTypeIncomeTbl" class="table table-hover">
+					<tr>
+						<th style="width:35%;">类别名称</th>
+						<th>说明</th>
+						<th style="width:80px;">系统保留</th>
+						<th style="width:150px">操作</th>
+					</tr>
+					<tr data-template="templateRow" class="sr-only">
+						<td data-key="bill_type_name"></td>
+						<td data-key="bill_type_desc"></td>
+						<td data-event="system_flag" class="text-center"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+						<td data-event="operate">
+							<a href="javascript:;" onclick="showBillTypeDialog('edit', this);"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 修改</a>
+							<a href="javascript:;" onclick="confirmBillType(this);"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>
+						</td>
+					</tr>
+					<tr class="noDataTr hidden">
+						<td colspan="4">没有找到符合条件的记录</td>
+					</tr>
+				</table>
+			</div>
+			
+			<div role="tabpanel" class="tab-pane fade" id="billTypeOutTab">
+				<p></p>
+				<p>	
+					<button type="button" class="btn btn-primary" onclick="showBillTypeDialog('add');">
+						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增类别
+					</button>
+				</p>
+				<table id="billTypePaymentTbl" class="table table-hover">
+					<tr>
+						<th style="width:35%;">类别名称</th>
+						<th>说明</th>
+						<th style="width:80px;">系统保留</th>
+						<th style="width:150px">操作</th>
+					</tr>
+					<tr data-template="templateRow" class="sr-only">
+						<td data-key="bill_type_name"></td>
+						<td data-key="bill_type_desc"></td>
+						<td data-event="system_flag" class="text-center"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+						<td data-event="operate">
+							<a href="javascript:;" onclick="showBillTypeDialog('edit', this);"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 修改</a>
+							<a href="javascript:;" onclick="confirmBillType(this);"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>
+						</td>
+					</tr>
+					<tr class="noDataTr hidden">
+						<td colspan="4">没有找到符合条件的记录</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="billTypeDialog" class="modal fade modal_wrapper" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">新增类别</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="billTypeName" class="col-sm-3 control-label">类别名称</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="billTypeName" name="billTypeName" placeholder="类别名称" data-key="bill_type_name" length="20" />
+							<div id="mustInputBillTypeName" class="alert alert-danger hidden" role="alert">请输入类别名称</div>
+							<div id="existBillTypeName" class="alert alert-danger hidden" role="alert">类别名称已存在</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="billTypeDesc" class="col-sm-3 control-label">说明</label>
+						<div class="col-sm-8">
+							<textarea id="billTypeDesc" name="billTypeDesc" class="form-control" rows="3" data-key="bill_type_desc"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="billTypeFlag" class="col-sm-3 control-label">收支标记</label>
+						<div class="col-sm-8">
+							<label class="radio-inline">
+								<input type="radio" name="billTypeFlag" id="billTypeFlagIncome" value="1" data-key="bill_type_flag" checked> 收入
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="billTypeFlag" id="billTypeFlagPayment" value="0" data-key="bill_type_flag"> 支出
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="submitBillType();">保存</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+			<input type="hidden" id="billTypeId" name="billTypeId" data-key="bill_type_id" />
+			<input type="hidden" id="op" name="op" />
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

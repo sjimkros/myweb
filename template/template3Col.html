@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="renderer" content="webkit">
+<link href="${domainUrl}/css/bootstrap.min.css" rel="stylesheet">
+<link href="${domainUrl}/css/myweb-base.css" rel="stylesheet">
+${css}
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>${pageTitle}</title>
+</head>
+<body>
+<script type="text/javascript" src="${domainUrl}/js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="${domainUrl}/js/bootstrap/bootstrap.js"></script>
+<script type="text/javascript" src="${domainUrl}/js/common.js"></script>
+${script}
+<script type="text/javascript">
+var domainUrl = "${domainUrl}/";
+$(function() {
+	setMenuActive("${activeMenuId}");
+});
+</script>
+<div class="container-fluid">
+	<div class="page-header">
+		<h1>&nbsp;${pageTitle} <small>${pageSubTitle}</small></h1>
+	</div>
+	${navPart}
+	<div class="row">
+		<div class="${bodyLeftClass}">
+		${bodyLeft}
+		</div>
+		<div class="${bodyCenterClass}">
+		${bodyCenter}
+		</div>
+		<div class="${bodyRightClass}">
+		${bodyRight}
+		</div>
+	</div>
+</div>
+<div id="alertDialog" class="modal fade modal_wrapper" data-backdrop="static">
+	<div class="modal-dialog modal-mid">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">警告</h4>
+			</div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="confirmDialog" class="modal fade modal_wrapper" data-backdrop="static">
+	<div class="modal-dialog modal-mid">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">确认</h4>
+			</div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary">确定</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

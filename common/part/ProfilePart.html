@@ -1,0 +1,80 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">我的信息</h3>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-4"></div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label for="oldPassword">原密码</label> <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="原密码" />
+					<div id="mustInputOldPassword" class="alert alert-danger hidden" role="alert">请输入密码</div>
+				</div>
+				<div class="form-group">
+					<label for="password">新密码</label> <input type="password" class="form-control" id="password" name="password" placeholder="新密码" />
+					<div id="mustInputPassword" class="alert alert-danger hidden" role="alert">请输入密码</div>
+				</div>
+				<div class="form-group">
+					<label for="password2">再输入一次</label> <input type="password" class="form-control" id="password2" name="password2" placeholder="再输入一次" />
+					<div id="mustInputPassword2" class="alert alert-danger hidden" role="alert">请输入密码</div>
+					<div id="mustInputSamePassword" class="alert alert-danger hidden" role="alert">两次密码必须输入一致</div>
+				</div>
+				<input type="button" id="updateButton" class="btn btn-primary" onclick="updateProfile();" value="更新" />
+				<div id="wrongOldPassword" class="alert alert-danger hidden" role="alert">原密码不正确</div>
+				<div id="updateSuccess" class="alert alert-success hidden" role="alert">更新成功</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function updateProfile() {
+		closeTips([ "mustInputOldPassword", "mustInputPassword", "mustInputPassword2", "mustInputSamePassword", "wrongOldPassword", "updateSuccess" ]);
+		
+		var oldPassword = $("#oldPassword");
+		var password = $("#password");
+		var password2 = $("#password2");
+
+		var isVaild = true;
+		if (isEmpty(oldPassword.val())) {
+			showTip("mustInputOldPassword");
+			isVaild = false;
+		}
+		if (isEmpty(password.val())) {
+			showTip("mustInputPassword");
+			isVaild = false;
+		}
+		if (isEmpty(password2.val())) {
+			showTip("mustInputPassword2");
+			isVaild = false;
+		}
+
+		if (isVaild) {
+			if(password.val() != password2.val()) {
+				showTip("mustInputSamePassword");
+				isVaild = false;
+			}
+		}
+
+		if (!isVaild)
+			return false;
+
+		$.ajax({
+			url : domainUrl + "common/action/user_action.php",
+			type : "POST",
+			data : {
+				"method" : "updateProfile",
+				"oldPassword" : oldPassword.val(),
+				"password" : password.val(),
+				"password2" : password2.val()
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.retCode == "0") {
+					showTip("updateSuccess");
+				} else {
+					showTip(data.retCode);
+				}
+			}
+		});
+	}
+</script>
