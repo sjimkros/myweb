@@ -180,7 +180,8 @@
 				<div id="mustRefreshRepayList" class="alert alert-danger hidden" role="alert">数据已过期，请关闭该对话框重新操作</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" onclick="submitBill();">提交</button>
+				<button type="button" class="btn btn-primary" onclick="submitBill(false);">提交</button>
+				<button id="submitAgainButton" type="button" class="btn btn-info" onclick="submitBill(true);">再提一笔</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
 			</div>
 			<input type="hidden" id="billId" name="billId" data-key="bill_id" />

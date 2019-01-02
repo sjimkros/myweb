@@ -76,10 +76,10 @@ class PbsBillSQL {
 			WHERE 
 				b.user_id = ${userId}
 				<IF_billTypeId_IS_NOTNULL>
-				AND a.bill_type_id = ${billTypeId}
+				AND b.bill_type_id = ${billTypeId}
 				</IF>
 				<IF_accountId_IS_NOTNULL>
-				AND a.account_id = ${accountId}
+				AND b.account_id = ${accountId}
 				</IF>
 				<IF_startDate_IS_NOTNULL>
 				AND TO_DAYS(bill_time) >= TO_DAYS(${startDate})

@@ -27,7 +27,8 @@ function initBillManageData() {
 		todayHighlight : true,
 		language : "zh-CN",
 		minView : "month",
-		orientation : "bottom"
+		orientation : "bottom",
+		weekStart : 7
 	});
 	// 加载基本数据
 	$.ajax({
@@ -315,6 +316,7 @@ function showBillDialog(op, billTypeFlag, obj) {
 
 	if (op == "add") {
 		dialogTitle.text("新增" + flagStr);
+		$("#submitAgainButton").removeClass("disabled");
 		billTime.val(getToday());
 		$('#dialog_billTime').datepicker('update', billTime.val());
 
@@ -325,6 +327,7 @@ function showBillDialog(op, billTypeFlag, obj) {
 
 	} else if (op == "edit") {
 		dialogTitle.text("修改" + flagStr);
+		$("#submitAgainButton").addClass("disabled");
 		getBill($(obj).attr("data-id"), billTypeFlag);
 
 	}
@@ -337,7 +340,7 @@ function showBillDialog(op, billTypeFlag, obj) {
 /**
  * 提交表单
  */
-function submitBill() {
+function submitBill(isContinue) {
 	cleanBillErrorTip();
 	var op = $("#op");
 	var billId = $("#billId");
@@ -440,7 +443,12 @@ function submitBill() {
 		success : function(data) {
 			if (data.retCode == "0") {
 				getBillList();
-				$("#billDialog").modal('hide');
+				if(isContinue) {
+					billSum.val("");
+					billDesc.val("");
+				} else {
+					$("#billDialog").modal('hide');
+				}
 
 				try {
 					refreshAccountQuickList();

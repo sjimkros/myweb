@@ -82,6 +82,11 @@ function get_bill_statistic() {
 	$billOut = $statisticService->getBillStatistic($userId, 0, $startDate, $endDate);
 	
 	$revenue = 0.0;
+
+ 	//获取图表插件数据
+ 	$billInChartData = get_pin_chart_array($billIn, 'bill_type_name', 'bill_sum');
+ 	$billOutChartData = get_pin_chart_array($billOut, 'bill_type_name', 'bill_sum');
+
 	// 计算总数
 	if (count($billIn) > 0) {
 		$totalIn = 0.0;
@@ -115,8 +120,8 @@ function get_bill_statistic() {
 	$revenue = number_format($revenue, 2);
 	$output = array (
 			'retCode' => $code,
-			'billInChart' => get_pin_chart_array($billIn, 'bill_type_name', 'bill_sum'),
-			'billOutChart' => get_pin_chart_array($billOut, 'bill_type_name', 'bill_sum'),
+			'billInChart' => $billInChartData,
+			'billOutChart' => $billOutChartData,
 			'billInStatistic' => $billIn,
 			'billOutStatistic' => $billOut,
 			'billRevenue' => $revenue 
@@ -138,14 +143,14 @@ function init_trend_statistic_data() {
 	$firstBillTime = $billService->getFirstBillTime($userId);
 	$yearList = array ();
 	if ($firstBillTime != null) {
-		$firstYear = (int) date('Y', $firstBillTime);
+		$firstYear = (int) date('Y', strtotime($firstBillTime));
 		$nowYear = (int) date('Y');
-		if ($firstYear > $nowYear) {
-			for($i = $firstYear; $i <= $nowYear; $i ++) {
-				$yearList[] = array (
+		if ($firstYear < $nowYear) {
+			for($i = $nowYear; $i >= $firstYear; $i --) {
+				array_push($yearList, array (
 						'yearVal' => (string) $i,
-						'yearStr' => (string) $i 
-				);
+						'yearStr' => (string) $i
+				));
 			}
 		}
 	} else {
@@ -181,54 +186,67 @@ function get_trend_statistic() {
 	$accountId = is_empty($_REQUEST['accountId']) ? null : (int) $_REQUEST['accountId'];
 	$billTypeId = is_empty($_REQUEST['billTypeId']) ? null : (int) $_REQUEST['billTypeId'];
 	$billTypeFlag = is_empty($_REQUEST['billTypeFlag']) ? null : (int) $_REQUEST['billTypeFlag'];
-	$year = $_REQUEST['year'];
+	$year = is_empty($_REQUEST['year']) ? date('Y') : $_REQUEST['year'];
 	$month = is_empty($_REQUEST['month']) ? null : $_REQUEST['month'];
 	
 	$code = '0';
 	
 	$statisticService = new StatisticService();
-	$chart = null;
 	
-	$rows = array();
-	$valueLabelArray = null;
-	if($month === null) {  //年度统计
+	$chartData1 = null;
+	$chartData2 = null;
+	$barLabel1 = null;
+	$barLabel2 = null;
+	$categoriesArray = array();
+	
+ 	//年度统计
+	if($month === null) {
+		//为选择收支类别，同时显示收入与支出的汇总统计
 		if($billTypeId === null && $billTypeFlag === null) {
-			$rows[] = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, 1, $year);
-			$rows[] = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, 0, $year);
-			$valueLabelArray[] = '收入';
-			$valueLabelArray[] = '支出';
+			$billInRows = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, 1, $year);
+			$billOutRows = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, 0, $year);
+			$barLabel1 = '收入';
+			$barLabel2 = '支出';
+			$chartData1 = get_bar_chart_array($billInRows, 'total_sum');
+			$chartData2 = get_bar_chart_array($billOutRows, 'total_sum');
+
 		} else {
-			$rows[] = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, $billTypeFlag, $year);
-			$valueLabelArray[] = '';
+			$rows = $statisticService->getTrendStatisticYear($userId, $accountId, $billTypeId, $billTypeFlag, $year);
+			$barLabel1 = ($billTypeFlag == 1) ? '收入' : '支出';
+			$chartData1 = get_bar_chart_array($rows, 'total_sum');
 		}
-				
-		if($rows != null) {
-			global $CHART_MONTH_ARRAY;
-			$chart = get_bar_chart_array($rows, $CHART_MONTH_ARRAY, $valueLabelArray, 'total_sum');
-		}
-	} else {  //月度统计
+
+		$categoriesArray = array('1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月');
+	
+	//月度统计
+	} else {
 		if($billTypeId === null && $billTypeFlag === null) {
-			$rows[] = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, 1, $year, $month);
-			$rows[] = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, 0, $year, $month);
-			$valueLabelArray[] = '收入';
-			$valueLabelArray[] = '支出';
+			$billInRows = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, 1, $year, $month);
+			$billOutRows = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, 0, $year, $month);
+			$barLabel1 = '收入';
+			$barLabel2 = '支出';
+			$chartData1 = get_bar_chart_array($billInRows, 'total_sum');
+			$chartData2 = get_bar_chart_array($billOutRows, 'total_sum');
+
 		} else {
-			$rows[] = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, $billTypeFlag, $year, $month);
-			$valueLabelArray[] = '';
+			$rows = $statisticService->getTrendStatisticMonth($userId, $accountId, $billTypeId, $billTypeFlag, $year, $month);
+			$barLabel1 = ($billTypeFlag == 1) ? '收入' : '支出';
+			$chartData1 = get_bar_chart_array($rows, 'total_sum');
 		}
 		
-		if($rows != null) {
-			$monthDays = get_month_days((int)$year, (int)$month);
-			for($i = 1; $i <= $monthDays; $i++) {
-				$dayArray[] = $i;
-			}
-			$chart = get_bar_chart_array($rows, $dayArray, $valueLabelArray, 'total_sum');
+		$monthDays = get_month_days((int)$year, (int)$month);
+		for($i = 1; $i <= $monthDays; $i++) {
+			$categoriesArray[] = $i;
 		}
 	}
-	
+
 	$output = array (
 			'retCode' => $code,
-			'trendChart' => $chart
+			'categories' => $categoriesArray,
+			'chartData1' => $chartData1,
+			'chartData2' => $chartData2,
+			'barLabel1' => $barLabel1,
+			'barLabel2' => $barLabel2
 	);
 	
 	echo get_json($output);

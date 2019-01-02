@@ -6,13 +6,11 @@
 		<p>
 		<form class="form-inline">
 			<div class="form-group">
-				<label for="year" class="control-label">年份</label> 
-				<select id="year" name="year" class="form-control">
+				<label for="year" class="control-label">年份</label> <select id="year" name="year" class="form-control">
 				</select>
 			</div>
 			<div class="form-group">
-				<label for="month" class="control-label">月份</label> 
-				<select id="month" name="month" class="form-control">
+				<label for="month" class="control-label">月份</label> <select id="month" name="month" class="form-control">
 					<option value="">全部</option>
 					<option value="1">01</option>
 					<option value="2">02</option>
@@ -29,8 +27,7 @@
 				</select>
 			</div>
 			<div class="form-group">
-				<label for="billType" class="control-label">收支类别</label> 
-				<select id="billType" name="billType" class="form-control">
+				<label for="billType" class="control-label">收支类别</label> <select id="billType" name="billType" class="form-control">
 					<option value="">全部</option>
 					<option value="f0">支出</option>
 					<option value="f1">收入</option>
@@ -38,8 +35,7 @@
 				</select>
 			</div>
 			<div class="form-group">
-				<label for="account" class="control-label">账户</label> 
-				<select id="account" name="account" class="form-control">
+				<label for="account" class="control-label">账户</label> <select id="account" name="account" class="form-control">
 					<option value="" class="all">全部</option>
 				</select>
 			</div>
@@ -49,16 +45,14 @@
 		</form>
 		</p>
 		<div class="row">
-			<div class="col-md-10">
+			<div class="col-md-12">
 				<div id="trendChartDiv">
-					<canvas id="trendChart" height="420"></canvas>
+					<div id="trendChart" style="width: 100%"></div>
 				</div>
 			</div>
-			<div class="col-md-2" id="trendLegendDiv">
-			
-			</div>
+			<div class="col-md-2" id="trendLegendDiv"></div>
 		</div>
-		
+
 	</div>
 </div>
 <script type="text/javascript">
@@ -114,20 +108,41 @@
 			dataType : "json",
 			success : function(data) {
 				if (data.retCode == "0") {
-					//图表
-					$("#trendChartDiv").empty().append("<canvas id=\"trendChart\" width=\"850\" height=\"420\"></canvas>");
+					//绘制柱状图表
+					var options = {
+				        chart: { type: 'column' },
+				        title: { text: null },
+				        credits: { enabled: false }, // 禁用版权信息
+				        xAxis: {
+				            categories: data.categories,
+				            crosshair: true
+				        },
+				        yAxis: {
+				            min: 0,
+				            title: { text: '金额' }
+				        },
+				        tooltip: {
+				            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+				            '<td style="padding:0"><b>{point.y:,.2f}</b></td></tr>',
+				            footerFormat: '</table>',
+				            shared: true,
+				            useHTML: true
+				        }
+				    };
+			        
+			        if(billTypeFlag == "" && billTypeId == "") {
+			        	options.series = new Array();
+						options.series[0] = { name: data.barLabel1, data: data.chartData1 };
+						options.series[1] = new Object();
+						options.series[1] = { name: data.barLabel2, data: data.chartData2 };
 
-					var ctx = $("#trendChart").get(0).getContext("2d");
-					var myNewChart = new Chart(ctx).Bar(data.trendChart, {
-						legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend legend-ul\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-					});
-					
-					if(billTypeId == "" && billTypeFlag == "") {
-						var legend = myNewChart.generateLegend();
-						$('#trendLegendDiv').html(legend);
-					} else {
-						$('#trendLegendDiv').html("");
-					}
+			        } else { 
+			        	options.series = new Array();
+						options.series[0] = { name: data.barLabel1, data: data.chartData1 };
+			        }
+
+					$('#trendChart').highcharts(options);
 				}
 			}
 		});

@@ -15,9 +15,9 @@ $base->addScript(array (
 		'/js/validate.js',
 		'/js/pbs/bill.js',
 		'/js/pbs/dateQuery.js',
-		'/js/bootstrap-datepicker.min.js',
-		'/js/locales/bootstrap-datepicker.zh-CN.min.js',
-		'/js/bootstrap-paginator.js'
+		'/js/bootstrap-datepicker/bootstrap-datepicker.min.js',
+		'/js/bootstrap-datepicker/bootstrap-datepicker.zh-CN.min.js',
+		'/js/bootstrap/bootstrap-paginator.js'
 ));
 
 $navPart = new NavPart();

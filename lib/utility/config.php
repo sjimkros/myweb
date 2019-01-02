@@ -40,7 +40,6 @@ function set_user_config($config_name, $value){
  */
 function get_page_size() {
 	$size = get_user_config('pageSize');
-	echo $size;
-	return ($size == null) ? 20 : $size;
+	return ($size == null) ? 10 : (int)$size;
 }
 ?>

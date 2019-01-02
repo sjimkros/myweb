@@ -427,7 +427,7 @@ class BillService extends ServiceBase {
 		
 		$rows = $this->getDAO()->select(PbsBillSQL::$SQL_SELECT_MIN_BILLTIME_BY_USERID, $params);
 		if ($rows != null) {
-			return $rows[0]['bill_min_time'];
+			return $rows[0]['min_bill_time'];
 		}
 		return null;
 	}

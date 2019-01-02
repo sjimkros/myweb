@@ -43,13 +43,13 @@
 					<div class="col-sm-6 text-center">
 						<h4>支出详情</h4>
 						<div id="billOutChartDiv">
-							<canvas id="billOutChart" height="350"></canvas>
+							<div id="billOutChart" style="height:350px"></div>
 						</div>
 					</div>
 					<div class="col-sm-6 text-center">
 						<h4>收入详情</h4>
 						<div id="billInChartDiv">
-							<canvas id="billInChart" height="350"></canvas>
+							<div id="billInChart" style="height:350px"></div>
 						</div>
 					</div>
 				</div>
@@ -109,7 +109,8 @@
 			todayHighlight : true,
 			language : "zh-CN",
 			minView : "month",
-			orientation : "bottom"
+			orientation : "bottom",
+			weekStart : 7
 		});
 		var timeSelect = $("#timeSelect");
 		timeSelect.val("3");
@@ -118,6 +119,7 @@
 		getStatisticBill();
 	});
 
+	//图表展示处理
 	function getStatisticBill() {
 		var startDate = $("#startDate");
 		var endDate = $("#endDate");
@@ -132,19 +134,51 @@
 			dataType : "json",
 			success : function(data) {
 				if (data.retCode == "0"){
-					//图表
-					$("#billOutChartDiv").empty().append("<canvas id=\"billOutChart\" height=\"350\"></canvas>");
-					$("#billInChartDiv").empty().append("<canvas id=\"billInChart\" height=\"350\"></canvas>");
-					
-					var ctx = $("#billOutChart").get(0).getContext("2d");
-					var myNewChart = new Chart(ctx).Pie(data.billOutChart, {
-						tooltipTemplate: "<%= label%>",
-					});
-					
-					var ctx2 = $("#billInChart").get(0).getContext("2d");
-					var myNewChart2 = new Chart(ctx2).Pie(data.billInChart, {
-						tooltipTemplate: "<%= label%>",
-					});
+					//支出图表
+					$('#billOutChart').highcharts({
+				        chart: {
+				            plotBackgroundColor: null,
+				            plotBorderWidth: null,
+				            plotShadow: false
+				        },
+				        credits:{
+						     enabled:false // 禁用版权信息
+						},
+				        title: {
+				            text: null
+				        },
+				        tooltip: {
+				            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> ({point.y:,.2f})'
+				        },
+				        series: [{
+				            type: 'pie',
+				            name: '占比',
+				            data: data.billOutChart
+				        }]
+				    });
+
+				    //收入图表
+					$('#billInChart').highcharts({
+				        chart: {
+				            plotBackgroundColor: null,
+				            plotBorderWidth: null,
+				            plotShadow: false
+				        },
+				        credits:{
+						     enabled:false // 禁用版权信息
+						},
+				        title: {
+				            text: null
+				        },
+				        tooltip: {
+				            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> ({point.y:,.2f})'
+				        },
+				        series: [{
+				            type: 'pie',
+				            name: '占比',
+				            data: data.billInChart
+				        }]
+				    });
 					
 					//表格
 					bindData("billOutTbl", data.billOutStatistic, "bill_type_id", statisticBillBindedEvent);

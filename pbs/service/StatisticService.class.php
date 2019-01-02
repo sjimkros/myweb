@@ -94,16 +94,18 @@ class StatisticService extends ServiceBase {
 		);
 		
 		$rows = $this->getDAO()->select(PbsStatisticSQL::$SQL_STATISTIC_TREND_YEAR, $params);
+		
 		$table = null;
 		if ($rows != null) {
 			// 无数据的月份，填充0
-			$table = array ();
+			$table = array();
 			for($i = 1; $i <= 12; $i ++) {
 				$table[] = array (
 						'month' => $i,
 						'total_sum' => 0.0 
 				);
 			}
+
 			foreach ($rows as $row) {
 				$month = (int) $row['month'] - 1;
 				$table[$month]['total_sum'] = (float) $row['total_sum'];
@@ -136,7 +138,7 @@ class StatisticService extends ServiceBase {
 		$rows = $this->getDAO()->select(PbsStatisticSQL::$SQL_STATISTIC_TREND_MONTH, $params);
 		$table = null;
 		if ($rows != null) {
-			// 无数据的月份，填充0
+			// 无数据的天，填充0
 			$table = array ();
 			$monthDays = get_month_days((int)$year, (int)$month);
 			for($i = 1; $i <= $monthDays; $i ++) {
