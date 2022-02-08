@@ -166,4 +166,17 @@ function is_empty(&$val) {
 	return true;
 }
 
+/**
+ * 获取请求数据，判断是否是json格式并进行转换
+ */
+function get_request_data() {
+	$rawData = file_get_contents("php://input");
+	$data = json_decode($rawData, TRUE);
+	
+    if ($data && (is_object($data)) || (is_array($data) && !empty(current($data)))) {
+        return $data;
+    }
+    return $_REQUEST;
+}
+
 ?>
