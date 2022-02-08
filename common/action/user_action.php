@@ -2,24 +2,27 @@
 include_once '_approot.php';
 include_once APPROOT . '/lib/header.php';
 
-$method = $_REQUEST['method'];
-
+$requestData = get_request_data();
+$method = $requestData['method'];
 switch ($method) {
 	case 'doLogin' :
-		do_login();
+		do_login($requestData);
 		break;
 	case 'updateProfile' :
-		update_profile();
+		update_profile($requestData);
+		break;
+	case 'getProfile' :
+		get_profile($requestData);
 		break;
 }
 
 /**
  * 登录处理
  */
-function do_login() {
-	$userName = $_REQUEST['userName'];
-	$password = md5($_REQUEST['password']);
-	$rememberMe = $_REQUEST['rememberMe'];
+function do_login($requestData) {
+	$userName = $requestData['userName'];
+	$password = md5($requestData['password']);
+	$rememberMe = $requestData['rememberMe'];
 	
 	$userService = new UserService();
 	$userId = $userService->checkPassword($userName, $password);
@@ -33,7 +36,8 @@ function do_login() {
 	
 	if ($userId == - 1) { // 用户名或密码不存在
 		$output = array (
-				'result' => 'wrongUserNamePassword' 
+			'retCode' => 'wrongUserNamePassword',
+			'result' => 'wrongUserNamePassword' 
 		);
 		
 		echo get_json($output);
@@ -52,6 +56,7 @@ function do_login() {
 			
 			// “记住我”流程补充
 			if ($rememberMe == 1) {
+				
 				$saveVal = $_SESSION['userId'] . md5($_SESSION['userId']);
 				setcookie('rememberMe', $saveVal, time() + 60 * 60 * 24 * 30, '/');
 			} else {
@@ -69,28 +74,28 @@ function do_login() {
 		}
 		
 		$output = array (
-				'retCode' => $code,
-				'redirect' => $redirect 
+			'retCode' => $code,
+			'redirect' => $redirect 
 		);
 		
 		echo get_json($output);
 		
-		if ($isCookieLogin == true) {
-			header('location: ' . $redirect);
-			exit();
-		}
+		//if ($isCookieLogin == true) {
+		//	header('location: ' . $redirect);
+		//	exit();
+		//}
 	}
 }
 
 /**
  * 更新用户信息
  */
-function update_profile() {
+function update_profile($requestData) {
 	$userId = $_SESSION['userId'];
 	
-	$oldPassword = is_empty($_REQUEST['oldPassword']) ? null : $_REQUEST['oldPassword'];
-	$password = is_empty($_REQUEST['password']) ? null : $_REQUEST['password'];
-	$password2 = is_empty($_REQUEST['password2']) ? null : $_REQUEST['password2'];
+	$oldPassword = is_empty($requestData['oldPassword']) ? null : $requestData['oldPassword'];
+	$password = is_empty($requestData['password']) ? null : $requestData['password'];
+	$password2 = is_empty($requestData['password2']) ? null : $requestData['password2'];
 	
 	$code = '0';
 	
@@ -102,9 +107,32 @@ function update_profile() {
 	}
 	
 	$output = array (
-			'retCode' => $code
+		'retCode' => $code
 	);
 	
 	echo get_json($output);
 }
+
+/**
+ * 获取登录用户信息
+ */
+function get_profile($requestData) {
+	$userId = $_SESSION['userId'];
+
+	$userService = new UserService();
+	$result = $userService->getUser($userId);
+	
+	if ($result != null) {
+		$data = array (
+			'name' => $result['user_name'],
+			'userid' => $userId
+		);
+		$output = array (
+			'data' => $data
+		);
+		echo get_json($output);
+	}
+
+}
+
 ?>
