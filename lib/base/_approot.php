@@ -1,3 +1,3 @@
 <?php
-if(!defined(APPROOT)) define(APPROOT, '../..');
+if(!defined(APPROOT)) define('APPROOT', '../..');
 ?>
